@@ -44,7 +44,7 @@ To get started! You're going to fork this repository, try creating a branch, mak
 Please read [CONTRIBUTING.md](https://github.com/FotieMConstant/dev-around/blob/main/CONTRIBUTING.md) for details on this project.
 
 ## Code of Conduct
-Please read [CODE_OF_CONDUCT.MD](https://github.com/FotieMConstant/dev-around/blob/main/CODE_OF_CONDUCT.md) for details on our code of conduct.
+Please read [CODE_OF_CONDUCT.md](https://github.com/FotieMConstant/dev-around/blob/main/CODE_OF_CONDUCT.md) for details on our code of conduct.
 
 ## BondReviewers
 Contributors helping to review/merge pull requests:
