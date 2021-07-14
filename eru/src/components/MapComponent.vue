@@ -72,9 +72,8 @@ export default {
       }).addTo(map);
 
       var currentUserIcon = L.icon({
-        iconUrl:
-          "https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-PNG-File.png",
-        iconSize: [30, 30], // size of the icon
+        iconUrl: "https://avatars.githubusercontent.com/u/42372656?v=4", // https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-PNG-File.png
+        iconSize: [40, 40], // size of the icon
         popupAnchor: [0, -15], // point from which the popup should open relative to the iconAnchor
       });
       L.marker([latitude, longitude], {
@@ -87,12 +86,16 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style >
 #map {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+}
+.leaflet-marker-icon {
+  border-radius: 30px;
+  border: 3px solid rgb(255, 99, 71);
 }
 </style>
