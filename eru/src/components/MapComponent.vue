@@ -9,6 +9,7 @@
 <script>
 // If you need to reference 'L', such as in 'L.icon', then be sure to
 // explicitly import 'leaflet' into your component
+import store from "@/store";
 import L from "leaflet";
 
 export default {
@@ -72,7 +73,7 @@ export default {
       }).addTo(map);
 
       var currentUserIcon = L.icon({
-        iconUrl: "https://avatars.githubusercontent.com/u/42372656?v=4", // https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-PNG-File.png
+        iconUrl: store.state.currentUser.avatar_url, // https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-PNG-File.png
         iconSize: [40, 40], // size of the icon
         popupAnchor: [0, -15], // point from which the popup should open relative to the iconAnchor
       });
@@ -80,7 +81,11 @@ export default {
         icon: currentUserIcon,
       })
         .addTo(map)
-        .bindPopup("Your location")
+        .bindPopup(
+          "<center>" +
+            store.state.currentUser.name +
+            "<br/>Your location</center>"
+        )
         .openPopup();
     },
   },

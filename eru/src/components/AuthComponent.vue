@@ -13,7 +13,7 @@
         ><br />
       </v-row>
       <v-row justify="center">
-        <v-btn @click="githubSignIn">Github auth </v-btn>
+        <v-btn @click="githubAuthorize">Github auth </v-btn>
         <!-- message -->
         <div>
           <v-container>
@@ -57,13 +57,17 @@
 </template>
 
 <script>
-// import store from "@/store";
+import store from "@/store";
 const axios = require("axios");
 
 export default {
   data() {
     return {
       overlay: false,
+      client_id: process.env.VUE_APP_CLIENT_ID,
+      client_secret: process.env.VUE_APP_CLIENT_SECRET,
+      domain: process.env.VUE_APP_DOMAIN,
+      api_domain: process.env.VUE_APP_API_DOMAIN,
       snackbarNotification: {
         snackMessage: "No data",
         status: false,
@@ -72,29 +76,100 @@ export default {
       },
     };
   },
+
+  mounted: function () {
+    this.githubSignInGetCodeFromUrl();
+    this.authWithToken(); // on mount try authenticating the user
+  },
   methods: {
-    // Google signin method
-    async githubSignIn() {
+    // github function to authorize a user and get code
+    githubAuthorize() {
+      console.log("Trying to reach github for auth");
+      // console.log(this.client_id);
+      // console.log(this.client_secret);
+      // console.log(this.domain);
+      this.overlay = true; //show loader when loading google auth
+      // redirect the user to get their credentials
+      window.location.href =
+        "https://github.com/login/oauth/authorize?client_id=" +
+        this.client_id +
+        "&redirect_uri=" +
+        this.domain +
+        "/auth&scope=read:user";
+    },
+    // function to get code from url
+    githubSignInGetCodeFromUrl() {
+      // if the data in the url is true
+      if (this.$route.query.code) {
+        const code = this.$route.query.code;
+        console.log("auth code => " + code);
+        // once i got the code
+        this.githubSignIn(code);
+      } else {
+        console.log("There is no code from github");
+      }
+    },
+    // End of github SignIn
+    // github signin method
+    async githubSignIn(code) {
       this.overlay = true; //show loader when loading google auth
       try {
+        // getting the token from my own custom api returned to me
         const response = await axios.get(
-          "https://github.com/login/oauth/authorize",
-          {
-            client_id: "b034464b59c69d255fef",
-            redirect_uri: "http://localhost:8080/",
-          }
+          `${this.api_domain}/v1/gh_access_token/${code}`
         );
-        console.log(response);
-        console.log("try");
+        console.log(response.data);
+        // checking if there were any errors
+        if (response.data.error) {
+          this.overlay = false; //hide loader
+          this.snackbarNotification.status = true;
+          this.snackbarNotification.color = "red";
+          this.snackbarNotification.snackMessage =
+            "Error: " + response.data.error_description; //error from backend
+          this.snackbarNotification.displayTime = 6000;
+        } else {
+          // in the case where everything is good
+          store.commit("setAccess_token", response.data.access_token);
+          this.authWithToken(); // when all is good i want to authenticate the user
+        }
+        console.log("from store => " + store.state.access_token);
       } catch (error) {
-        this.overlay = false; //hide loader when loading google auth
+        this.overlay = false; //hide loader
         this.snackbarNotification.status = true;
         this.snackbarNotification.color = "red";
         this.snackbarNotification.snackMessage = error;
         this.snackbarNotification.displayTime = 6000;
       }
     },
-    // End of google SignIn
+    // End of github SignIn
+    // function to authenticate user with token
+    async authWithToken() {
+      // only auth if token is in store
+      if (store.state.access_token) {
+        console.log("Authenticating with token...");
+        try {
+          let response = await axios.get(`https://api.github.com/user`, {
+            headers: {
+              Authorization: `Bearer ${store.state.access_token}`, // passing the token from store
+            },
+          });
+          response = response.data;
+          console.log("Return data => ");
+          // console.log(response);
+          store.commit("setCurrentUser", response); // setting logged in user to store
+          console.log(store.state.currentUser);
+          this.$router.push("/");
+        } catch (error) {
+          this.overlay = false; //hide loader
+          this.snackbarNotification.status = true;
+          this.snackbarNotification.color = "red";
+          this.snackbarNotification.snackMessage = error;
+          this.snackbarNotification.displayTime = 6000;
+        }
+      } else {
+        console.log("Not authenticating yet!");
+      }
+    },
   },
 
   computed: {},
