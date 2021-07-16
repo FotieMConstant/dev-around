@@ -18,7 +18,7 @@
   <a href="#">Documentation</a>
 </h3>
 
-<p align="center"><b>https://bond-nu.vercel.app/</b></p>
+<p align="center"><b>https://devaround.vercel.app/</b></p>
 
 ---
 Dev-around is an app where you can search for developers around, connect with local devs!
